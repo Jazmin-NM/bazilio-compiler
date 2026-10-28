@@ -8,12 +8,14 @@ ENV PYTHONUNBUFFERED=1
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Instalamos las dependencias del sistema operativo (LilyPond, TiMidity y Soundfonts)
-RUN apt-get update && apt-get install -y \
+# Actualizamos repositorios, habilitamos non-free (necesario para soundfonts en Debian) e instalamos herramientas
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    gnupg \
     lilypond \
     timidity \
-    soundfont-fluid \
-    && rm -rf /var/lib/apt/lists/*
+    fluidsynth \
+     && rm -rf /var/lib/apt/lists/*
 
 # Copiamos e instalamos las dependencias de Python
 COPY requirements.txt .
