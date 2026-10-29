@@ -292,13 +292,12 @@ def version_lilypond():
     except (OSError, AttributeError):
         return "2.20.0"
  
- 
 def texto_lilypond(partitura, tempo=120):
     notas = [nota_a_lilypond(v) for v in partitura]
     renglones = [" ".join(notas[i:i + 8]) for i in range(0, len(notas), 8)]
     cuerpo = "\n".join("      " + r for r in renglones)
     return (
-        f'\\version "{version_lilypond()}"\n'
+        '\\version "2.24.4"\n'
         "\\score {\n"
         "    \\absolute {\n"
         f"        \\tempo 4 = {tempo}\n"
