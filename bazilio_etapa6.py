@@ -305,6 +305,7 @@ SOUNDFONT = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
 
 def generar_salida(partitura, base, solo_ly=False, aviso=print):
     """Escribe base.ly y convierte con las herramientas externas que haya instaladas."""
+    base = os.path.abspath(base)
     ruta_ly = base + ".ly"
     with open(ruta_ly, "w", encoding="utf-8") as f:
         f.write(texto_lilypond(partitura))
