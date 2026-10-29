@@ -341,6 +341,15 @@ def generar_salida(partitura, base, solo_ly=False, aviso=print):
         if not correr(cmd, descripcion):
             break
         generados += [base + e for e in extensiones]
+    # PDF de la partitura (independiente del audio)
+    if correr(["lilypond", "-o", base, ruta_ly], "el PDF"):
+        generados.append(base + ".pdf")
+        # >>> NUEVO: imágenes PNG de cada página, para verlas en la web
+        correr(["gs", "-q", "-dNOPAUSE", "-dBATCH",
+                "-sDEVICE=png16m", "-r110",
+                "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4",
+                f"-sOutputFile={base}-pagina%d.png", base + ".pdf"],
+               "las imágenes de la partitura")
     return generados
 
     #Linea de comandos

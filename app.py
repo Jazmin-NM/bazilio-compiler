@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import subprocess
+import glob
 
 st.title("Generador Musical - Bazilio")
 st.write("Escribe tus notas en Bazilio y genera partituras y audio directamente desde la web.")
@@ -24,6 +25,8 @@ if st.button("Generar y Reproducir Audio"):
         for ext in (".ly", ".midi", ".wav", ".mp3", ".pdf"):
             if os.path.exists(base_path + ext):
                 os.remove(base_path + ext)
+        for png in glob.glob(base_path + "-pagina*.png"):
+            os.remove(png)
 
         try:
             resultado = subprocess.run(
@@ -48,6 +51,13 @@ if st.button("Generar y Reproducir Audio"):
                 audio_a_reproducir = mp3_path
             elif os.path.exists(wav_path):
                 audio_a_reproducir = wav_path
+                
+            #NUEVO: mostrar la partitura en pantalla
+            imagenes = sorted(glob.glob(base_path + "-pagina*.png"))
+            if imagenes:
+                st.subheader("Partitura")
+                for ruta_png in imagenes:
+                    st.image(ruta_png, use_container_width=True)
 
             if audio_a_reproducir:
                 st.audio(audio_a_reproducir)
@@ -60,6 +70,19 @@ if st.button("Generar y Reproducir Audio"):
                     )
             else:
                 st.info("Se generó la partitura pero no se encontró el archivo de audio para reproducción directa.")
+
+            # >>> NUEVO: descarga de la partitura en PDF
+            pdf_path = base_path + ".pdf"
+            if os.path.exists(pdf_path):
+                with open(pdf_path, "rb") as file:
+                    st.download_button(
+                        label="Descargar Partitura (PDF)",
+                        data=file,
+                        file_name="partitura_bazilio.pdf",
+                        mime="application/pdf"
+                    )
+            else:
+                st.info("No se pudo generar el PDF de la partitura.")
 
         except subprocess.CalledProcessError as e:
             st.error(f"Error de compilación:\n{e.stderr}")
