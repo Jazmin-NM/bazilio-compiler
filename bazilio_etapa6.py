@@ -331,10 +331,8 @@ def generar_salida(partitura, base, solo_ly=False, aviso=print):
     # cada paso necesita el archivo del anterior: si uno falla, se detiene la cadena
     pasos = [
         (["lilypond", "-o", base, ruta_ly], "el PDF y el MIDI", [".pdf", ".midi"]),
-        (["timidity", "-Ow", "-o", base + ".wav", base + ".midi"], "el WAV", [".wav"]),
-        (["ffmpeg", "-y", "-loglevel", "error", "-i", base + ".wav",
-          "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"],
-         "el MP3", [".mp3"]),
+        (["timidity", "-S", "/usr/share/sounds/sf2/FluidR3_GM.sf2", "-Ow", "-o", base + ".wav", base + ".midi"], "el WAV", [".wav"]),
+        (["ffmpeg", "-y", "-loglevel", "error", "-i", base + ".wav", "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"], "el MP3", [".mp3"]),
     ]
     for cmd, descripcion, extensiones in pasos:
         if not correr(cmd, descripcion):
