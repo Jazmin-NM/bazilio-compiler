@@ -300,6 +300,9 @@ def texto_lilypond(partitura, tempo=120):
         "}\n"
     )
  
+SOUNDFONT = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+
+
 def generar_salida(partitura, base, solo_ly=False, aviso=print):
     """Escribe base.ly y convierte con las herramientas externas que haya instaladas."""
     ruta_ly = base + ".ly"
@@ -308,33 +311,31 @@ def generar_salida(partitura, base, solo_ly=False, aviso=print):
     generados = [ruta_ly]
     if solo_ly:
         return generados
- 
+
     def correr(cmd, descripcion):
         if shutil.which(cmd[0]) is None:
             aviso(f"Aviso: no se encontró «{cmd[0]}», no se generó {descripcion}.")
             return False
         r = subprocess.run(cmd, capture_output=True, text=True)
         if r.returncode != 0:
-            detalle = r.stderr.strip()[-400:]
+            # sin recortar, para ver el error real
+            detalle = (r.stdout + "\n" + r.stderr).strip()
             aviso(f"Aviso: falló {cmd[0]} al generar {descripcion}:\n{detalle}")
             return False
         return True
- 
-    # cada paso necesita el archivo del anterior: si uno falla, se detiene la cadena
-    SOUNDFONT = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
 
+    # cada paso necesita el archivo del anterior: si uno falla, se detiene la cadena
     pasos = [
-        # -dno-print-pages: no genera PDF, solo el MIDI (más rápido y más fiable)
+        # -dno-print-pages: no genera el PDF, solo el MIDI
         (["lilypond", "-dno-print-pages", "-o", base, ruta_ly],
-        "el MIDI", [".midi"]),
+         "el MIDI", [".midi"]),
         (["fluidsynth", "-ni", "-r", "44100", "-F", base + ".wav",
-        SOUNDFONT, base + ".midi"],
-        "el WAV", [".wav"]),
+          SOUNDFONT, base + ".midi"],
+         "el WAV", [".wav"]),
         (["ffmpeg", "-y", "-loglevel", "error", "-i", base + ".wav",
-        "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"],
-        "el MP3", [".mp3"]),
+          "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"],
+         "el MP3", [".mp3"]),
     ]
-    
     for cmd, descripcion, extensiones in pasos:
         if not correr(cmd, descripcion):
             break

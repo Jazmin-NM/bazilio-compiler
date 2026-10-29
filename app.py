@@ -12,51 +12,54 @@ if st.button("Generar y Reproducir Audio"):
         st.warning("Por favor, ingresa algunas notas.")
     else:
         codigo_bazilio = f"Main |:\n    (:){{{notas_usuario}}}\n:|"
-        
+
         os.makedirs("programas", exist_ok=True)
         ruta_archivo = "programas/web_dinamico.bzl"
-        
+
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             f.write(codigo_bazilio)
-        
+
+        # Borra archivos de ejecuciones anteriores para no reproducir audio viejo
         base_path = os.path.splitext(ruta_archivo)[0]
         for ext in (".ly", ".midi", ".wav", ".mp3", ".pdf"):
             if os.path.exists(base_path + ext):
                 os.remove(base_path + ext)
-            
+
         try:
             resultado = subprocess.run(
                 ["python3", "bazilio_etapa6.py", ruta_archivo],
-                capture_output=True, text=True, check=True
+                capture_output=True,
+                text=True,
+                check=True
             )
             st.success("¡Archivos generados correctamente!")
+
+            # Avisos internos del compilador (si los hubiera)
             if resultado.stdout:
-                st.info(f"Mensajes del compilador:\n{resultado.stdout}")
+                st.code(resultado.stdout)
             if resultado.stderr:
                 st.warning(f"Detalles:\n{resultado.stderr}")
-            
-            # Muestra los avisos internos del compilador si los hubiera
-            
+
             wav_path = base_path + ".wav"
             mp3_path = base_path + ".mp3"
-            
+
             audio_a_reproducir = None
             if os.path.exists(mp3_path):
                 audio_a_reproducir = mp3_path
             elif os.path.exists(wav_path):
                 audio_a_reproducir = wav_path
-                
-            if audio_a_reproducir and os.path.exists(audio_a_reproducir):
+
+            if audio_a_reproducir:
                 st.audio(audio_a_reproducir)
                 with open(audio_a_reproducir, "rb") as file:
                     st.download_button(
                         label="Descargar Audio",
                         data=file,
                         file_name=os.path.basename(audio_a_reproducir),
-                        mime="audio/mp3"
+                        mime="audio/mpeg" if audio_a_reproducir.endswith(".mp3") else "audio/wav"
                     )
             else:
                 st.info("Se generó la partitura pero no se encontró el archivo de audio para reproducción directa.")
-                
+
         except subprocess.CalledProcessError as e:
             st.error(f"Error de compilación:\n{e.stderr}")
