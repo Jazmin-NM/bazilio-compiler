@@ -283,15 +283,7 @@ def nota_a_lilypond(valor):
     marcas = "'" * (octava - 3) if octava > 3 else "," * (3 - octava)
     return f"{letra}{marcas}4"
  
- 
-def version_lilypond():
-    try:
-        salida = subprocess.run(["lilypond", "--version"],
-                                capture_output=True, text=True).stdout
-        return re.search(r"(\d+\.\d+\.\d+)", salida).group(1)
-    except (OSError, AttributeError):
-        return "2.20.0"
- 
+
 def texto_lilypond(partitura, tempo=120):
     notas = [nota_a_lilypond(v) for v in partitura]
     renglones = [" ".join(notas[i:i + 8]) for i in range(0, len(notas), 8)]
