@@ -14,9 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     lilypond \
     timidity \
-    fluidsynth \
+    soundfont-fluid \
     ffmpeg \
-     && rm -rf /var/lib/apt/lists/*
+    && echo "soundfont /usr/share/sounds/sf2/FluidR3_GM.sf2" >> /etc/timidity/timidity.cfg \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copiamos e instalamos las dependencias de Python
 COPY requirements.txt .
