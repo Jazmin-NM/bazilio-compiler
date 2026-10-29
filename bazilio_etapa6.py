@@ -321,11 +321,20 @@ def generar_salida(partitura, base, solo_ly=False, aviso=print):
         return True
  
     # cada paso necesita el archivo del anterior: si uno falla, se detiene la cadena
+    SOUNDFONT = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
+
     pasos = [
-        (["lilypond", "-o", base, ruta_ly], "el PDF y el MIDI", [".pdf", ".midi"]),
-        (["timidity", "-Ow", "-o", base + ".wav", base + ".midi"], "el WAV", [".wav"]),
-        (["ffmpeg", "-y", "-loglevel", "error", "-i", base + ".wav", "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"], "el MP3", [".mp3"]),
+        # -dno-print-pages: no genera PDF, solo el MIDI (más rápido y más fiable)
+        (["lilypond", "-dno-print-pages", "-o", base, ruta_ly],
+        "el MIDI", [".midi"]),
+        (["fluidsynth", "-ni", "-r", "44100", "-F", base + ".wav",
+        SOUNDFONT, base + ".midi"],
+        "el WAV", [".wav"]),
+        (["ffmpeg", "-y", "-loglevel", "error", "-i", base + ".wav",
+        "-codec:a", "libmp3lame", "-qscale:a", "2", base + ".mp3"],
+        "el MP3", [".mp3"]),
     ]
+    
     for cmd, descripcion, extensiones in pasos:
         if not correr(cmd, descripcion):
             break
