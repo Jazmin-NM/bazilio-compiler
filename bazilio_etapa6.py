@@ -297,16 +297,17 @@ def texto_lilypond(partitura, tempo=120):
     notas = [nota_a_lilypond(v) for v in partitura]
     renglones = [" ".join(notas[i:i + 8]) for i in range(0, len(notas), 8)]
     cuerpo = "\n".join("      " + r for r in renglones)
-    return (f'\\version "{version_lilypond()}"\n'
-            "\\score {\n"
-            "  \\absolute {\n"
-            f"    \\tempo 4 = {tempo}\n"
-            f"{cuerpo}\n"
-            "  }\n"
-            "  \\layout { }\n"
-            "  \\midi { }\n"
-            "}\n")
- 
+    return (
+        '\\version "2.24.4"\n'
+        "\\score {\n"
+        "    \\absolute {\n"
+        f"        \\tempo 4 = {tempo}\n"
+        f"{cuerpo}\n"
+        "    }\n"
+        "    \\layout { }\n"
+        "    \\midi { }\n"
+        "}\n"
+    )
  
 def generar_salida(partitura, base, solo_ly=False, aviso=print):
     """Escribe base.ly y convierte con las herramientas externas que haya instaladas."""
