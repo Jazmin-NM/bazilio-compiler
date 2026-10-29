@@ -27,6 +27,9 @@ if st.button("Generar y Reproducir Audio"):
                 check=True
             )
             st.success("¡Archivos generados correctamente!")
+            # Muestra los avisos internos del compilador si los hubiera
+            if resultado.stdout:
+                st.info(f"Mensajes del compilador:\n{resultado.stdout}")
 
             base_path, _ = os.path.splitext(ruta_archivo)
             wav_path = base_path + ".wav"
