@@ -18,20 +18,25 @@ if st.button("Generar y Reproducir Audio"):
         
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             f.write(codigo_bazilio)
+        
+        base_path = os.path.splitext(ruta_archivo)[0]
+        for ext in (".ly", ".midi", ".wav", ".mp3", ".pdf"):
+            if os.path.exists(base_path + ext):
+                os.remove(base_path + ext)
             
         try:
             resultado = subprocess.run(
                 ["python3", "bazilio_etapa6.py", ruta_archivo],
-                capture_output=True,
-                text=True,
-                check=True
+                capture_output=True, text=True, check=True
             )
             st.success("¡Archivos generados correctamente!")
-            # Muestra los avisos internos del compilador si los hubiera
             if resultado.stdout:
                 st.info(f"Mensajes del compilador:\n{resultado.stdout}")
-
-            base_path, _ = os.path.splitext(ruta_archivo)
+            if resultado.stderr:
+                st.warning(f"Detalles:\n{resultado.stderr}")
+            
+            # Muestra los avisos internos del compilador si los hubiera
+            
             wav_path = base_path + ".wav"
             mp3_path = base_path + ".mp3"
             
