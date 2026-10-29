@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Actualizamos e instalamos LilyPond, TiMidity, Soundfonts y ffmpeg
+# Instalamos LilyPond, TiMidity, Soundfonts y FFmpeg, y configuramos la ruta del soundfont
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg \
